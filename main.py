@@ -69,7 +69,7 @@ Contacts_sub_forms = pd.DataFrame()
 for index, row in Contacts.iterrows():
     if len(row['form-submissions']) > 0 :
         temp_contacts_sub_forms = pd.DataFrame(row['form-submissions'])
-        temp_contacts_sub_forms['CONTACT_ID'] = row['profile-token']    
+        temp_contacts_sub_forms['CONTACT_ID'] = row['canonical_vid']    
         Contacts_sub_forms = Contacts_sub_forms.append(temp_contacts_sub_forms)
 
 Contacts = Contacts.drop('form-submissions', 1)
