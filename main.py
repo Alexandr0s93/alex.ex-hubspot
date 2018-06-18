@@ -56,25 +56,54 @@ def getCompanies(token):
             return final_df
         
         offset = req_response['offset']
+        
+def getLists(token):
+    
+    final_df = pd.DataFrame()
+    offset = 0
+    
+    while True:
+        
+        parameters = {'hapikey': token, 'offset': offset, 'limit': 250}
+        req = requests.get('https://api.hubapi.com/contacts/v1/lists', params = parameters)
+        req_response = req.json()
+        
+        if req_response['has-more'] == True:
+            final_df = final_df.append(json_normalize(req_response['lists']))
+        else:
+            final_df = final_df.append(json_normalize(req_response['lists']))
+            return final_df
+        
+        offset = req_response['offset']
 
 ## Datasets extraction
 print('Extracting Companies from HubSpot CRM')        
 Companies = getCompanies(token)
 print('Extracting Contacts from HubSpot CRM')
 Contacts = getContacts(token)
+print('Extracting Lists from HubSpot CRM')
+Lists = getLists(token)
 
 Contacts_sub_forms = pd.DataFrame()
+Contacts_Lists = pd.DataFrame()
 
-## Create table with Contact's form submissions and drop column afterwards
+## Create table with Contact's form submissions and lists and drop column afterwards
 for index, row in Contacts.iterrows():
+    
     if len(row['form-submissions']) > 0 :
         temp_contacts_sub_forms = pd.DataFrame(row['form-submissions'])
         temp_contacts_sub_forms['CONTACT_ID'] = row['canonical-vid']    
         Contacts_sub_forms = Contacts_sub_forms.append(temp_contacts_sub_forms)
+    if len(row['list-memberships']) > 0 :
+        temp_contacts_lists = pd.DataFrame(row['list-memberships'])
+        temp_contacts_lists['CONTACT_ID'] = row['canonical-vid']
+        Contacts_Lists = Contacts_Lists.append(temp_contacts_lists)
 
-Contacts = Contacts.drop('form-submissions', 1)
+Contacts = Contacts.drop(['form-submissions', 'list-memberships'], 1)
 
 ## Write extracted data
 Companies.to_csv('/data/out/tables/companies.csv', index = False)
 Contacts.to_csv('/data/out/tables/contacts.csv', index = False)
+Lists.to_csv('/data/out/tables/lists.csv', index = False)
 Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
+Contacts_Lists.to_csv('/data/out/tables/contacts_lists.csv', index = False)
