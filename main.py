@@ -23,7 +23,7 @@ def getContacts(token):
     
     while True:
         
-        parameters = {'hapikey': token, 'property': contact_properties, 'vidOffset': offset, 'count': 100, 'formSubmissionMode':'all'}
+        parameters = {'hapikey': token, 'property': contact_properties, 'vidOffset': offset, 'count': 100, 'formSubmissionMode':'all', 'showListMemberships':'true'}
         req = requests.get('https://api.hubapi.com/contacts/v1/lists/all/contacts/all', params = parameters)
         req_response = req.json()
             
@@ -78,5 +78,3 @@ Contacts = Contacts.drop('form-submissions', 1)
 Companies.to_csv('/data/out/tables/companies.csv', index = False)
 Contacts.to_csv('/data/out/tables/contacts.csv', index = False)
 Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
-
-
