@@ -7,7 +7,7 @@ from pandas.io.json import json_normalize
 from keboola import docker
 #==============================================================================
 
-## Initialise app and get parameters from configuration.
+# Initialise app and get parameters from configuration.
 cfg = docker.Config('/data/')
 token = cfg.get_parameters()['#token']
 
@@ -57,6 +57,50 @@ def getCompanies(token):
         
         offset = req_response['offset']
         
+def getDeals(token):
+    
+    final_df = pd.DataFrame()
+    offset = 0 
+    deal_properties = ['authority', 'budget', 'campaign_source', 'hs_analytics_source', 'hs_campaign', 
+                       'hs_lastmodifieddate', 'need', 'partner_name', 'timeframe', 'dealname', 'amount', 'closedate', 'pipeline',
+                       'createdate', 'engagements_last_meeting_booked', 'dealtype', 'hs_createdate', 'description',
+                       'start_date', 'closed_lost_reason',  'closed_won_reason', 'end_date', 'lead_owner', 'tech_owner', 
+                       'service_amount', 'contract_type', 'hubspot_owner_id']
+    
+    while True:
+        
+        parameters = {'hapikey': token, 'properties': deal_properties, 'offset': offset, 'limit': 250, 
+                      'propertiesWithHistory': 'dealstage','includeAssociations': 'true'}
+        req = requests.get('https://api.hubapi.com/deals/v1/deal/paged', params = parameters)
+        req_response = req.json()
+            
+        if req_response['hasMore'] == True:
+            final_df = final_df.append(json_normalize(req_response['deals']))
+        else:
+            final_df = final_df.append(json_normalize(req_response['deals']))
+            return final_df
+        
+        offset = req_response['offset']
+        
+def getActivities(token):
+    
+    final_df = pd.DataFrame()
+    offset = 0
+    
+    while True:
+        
+        parameters = {'hapikey': token, 'offset': offset, 'limit': 250}
+        req = requests.get('https://api.hubapi.com/engagements/v1/engagements/paged', params = parameters)
+        req_response = req.json()
+        
+        if req_response['hasMore'] == True:
+            final_df = final_df.append(json_normalize(req_response['results']))
+        else:
+            final_df = final_df.append(json_normalize(req_response['results']))
+            return final_df
+        
+        offset = req_response['offset']
+
 def getLists(token):
     
     final_df = pd.DataFrame()
@@ -75,14 +119,32 @@ def getLists(token):
             return final_df
         
         offset = req_response['offset']
-
+        
+def getOwners(token):
+    
+    final_df = pd.DataFrame()
+    
+    parameters = {'hapikey': token}
+    req = requests.get(' https://api.hubapi.com/owners/v2/owners/', params = parameters)
+    req_response = req.json()
+        
+    final_df = final_df.append(json_normalize(req_response))
+    
+    return final_df
+                    
 ## Datasets extraction
 print('Extracting Companies from HubSpot CRM')        
 Companies = getCompanies(token)
 print('Extracting Contacts from HubSpot CRM')
 Contacts = getContacts(token)
+print('Extracting Deals from HubSpot CRM')
+Deals = getDeals(token)
+print('Extracting Activities from HubSpot CRM')
+Activities = getActivities(token)
 print('Extracting Lists from HubSpot CRM')
 Lists = getLists(token)
+print('Extracting Owners from HubSpot CRM')
+Owners = getOwners(token)
 
 Contacts_sub_forms = pd.DataFrame()
 Contacts_Lists = pd.DataFrame()
@@ -101,9 +163,12 @@ for index, row in Contacts.iterrows():
 
 Contacts = Contacts.drop(['form-submissions', 'list-memberships'], 1)
 
-## Write extracted data
+### Write extracted data
 Companies.to_csv('/data/out/tables/companies.csv', index = False)
 Contacts.to_csv('/data/out/tables/contacts.csv', index = False)
+Deals.to_csv('/data/out/tables/deals.csv', index = False)
+Activities.to_csv('/data/out/tables/activities.csv', index = False)
 Lists.to_csv('/data/out/tables/lists.csv', index = False)
+Owners.to_csv('/data/out/tables/owners.csv', index = False)
 Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
 Contacts_Lists.to_csv('/data/out/tables/contacts_lists.csv', index = False)
