@@ -22,7 +22,7 @@ def getContacts(token):
                          'industry','associatedcompanyid','hs_lead_status','lastmodifieddate',
                          'newsletter_opt_in','source','hs_email_optout','twitterhandle','lead_type',
                          'hubspot_owner_id','notes_last_updated','hs_analytics_source','opt_in',
-                         'createdate','hs_twitterid','associatedcompanyid']
+                         'createdate','hs_twitterid','associatedcompanyid','lifecyclestage']
     
     while True:
         
