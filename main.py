@@ -19,7 +19,10 @@ def getContacts(token):
                          'ip_country_code','newsletter_opt_in','firstname','linkedin_profile',
                          'lastname','email','mobilephone','phone','city',
                          'country','region','jobtitle','company','website','numemployees',
-                         'industry','associatedcompanyid']
+                         'industry','associatedcompanyid','hs_lead_status','lastmodifieddate',
+                         'newsletter_opt_in','source','hs_email_optout','twitterhandle','lead_type',
+                         'hubspot_owner_id','notes_last_updated','hs_analytics_source','opt_in',
+                         'createdate','hs_twitterid','associatedcompanyid']
     
     while True:
         
@@ -41,7 +44,9 @@ def getCompanies(token):
     offset = 0 
     company_properties = ['about_us','name','phone','facebook_company_page',
                          'city','country','website','numberofemployees',
-                         'industry','annualrevenue','linkedin_company_page']
+                         'industry','annualrevenue','linkedin_company_page',
+                         'hs_lastmodifieddate','hubspot_owner_id','notes_last_updated','description',
+                         'createdate','numberofemployees','about_us']
     
     while True:
         
@@ -65,7 +70,7 @@ def getDeals(token):
                        'hs_lastmodifieddate', 'need', 'partner_name', 'timeframe', 'dealname', 'amount', 'closedate', 'pipeline',
                        'createdate', 'engagements_last_meeting_booked', 'dealtype', 'hs_createdate', 'description',
                        'start_date', 'closed_lost_reason',  'closed_won_reason', 'end_date', 'lead_owner', 'tech_owner', 
-                       'service_amount', 'contract_type', 'hubspot_owner_id']
+                       'service_amount', 'contract_type', 'hubspot_owner_id','partner_name','notes_last_updated']
     
     while True:
         
