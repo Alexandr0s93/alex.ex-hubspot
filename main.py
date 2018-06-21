@@ -7,7 +7,7 @@ from pandas.io.json import json_normalize
 from keboola import docker
 #==============================================================================
 
-# Initialise app and get parameters from configuration.
+## Initialise app and get parameters from configuration.
 cfg = docker.Config('/data/')
 token = cfg.get_parameters()['#token']
 
@@ -95,8 +95,10 @@ def getActivities(token):
         
         if req_response['hasMore'] == True:
             final_df = final_df.append(json_normalize(req_response['results']))
+            final_df.drop(['metadata.text', 'metadata.html'], 1)
         else:
             final_df = final_df.append(json_normalize(req_response['results']))
+            final_df.drop(['metadata.text', 'metadata.html'], 1)
             return final_df
         
         offset = req_response['offset']
@@ -140,7 +142,7 @@ Contacts = getContacts(token)
 print('Extracting Deals from HubSpot CRM')
 Deals = getDeals(token)
 print('Extracting Activities from HubSpot CRM')
-Activities = getActivities(token)
+Activities = getActivities('90a176d2-789f-4393-99aa-96b3f908934f')
 print('Extracting Lists from HubSpot CRM')
 Lists = getLists(token)
 print('Extracting Owners from HubSpot CRM')
@@ -149,7 +151,7 @@ Owners = getOwners(token)
 Contacts_sub_forms = pd.DataFrame()
 Contacts_Lists = pd.DataFrame()
 
-## Create table with Contact's form submissions and lists and drop column afterwards
+### Create table with Contact's form submissions and lists and drop column afterwards
 for index, row in Contacts.iterrows():
     
     if len(row['form-submissions']) > 0 :
