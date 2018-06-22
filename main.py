@@ -150,7 +150,7 @@ def getOwners(token):
     final_df = final_df.append(json_normalize(req_response))
     
     return final_df
-                 
+
 ## Datasets extraction
 print('Extracting Companies from HubSpot CRM')        
 Companies = getCompanies(token)
@@ -169,6 +169,7 @@ Owners = getOwners(token)
 
 Contacts_sub_forms = pd.DataFrame()
 Contacts_Lists = pd.DataFrame()
+Deals_Contacts_list = pd.DataFrame()
 Deals_stage_history = pd.DataFrame()
 Pipeline_stages = pd.DataFrame()
 
@@ -184,13 +185,19 @@ for index, row in Contacts.iterrows():
         temp_contacts_lists['CONTACT_ID'] = row['canonical-vid']
         Contacts_Lists = Contacts_Lists.append(temp_contacts_lists)
 
-### Create table with Deals' Stage History
+### Create table with Deals' Stage History & Deals' Contacts List
 for index, row in Deals.iterrows():
     
     if len(row['properties.dealstage.versions']) > 0 :
         temp_stage_history= pd.DataFrame(row['properties.dealstage.versions'])
         temp_stage_history['DEAL_ID'] = row['dealId']    
         Deals_stage_history = Deals_stage_history.append(temp_stage_history)
+        
+    if len(row['associations.associatedVids']) != '[]' :
+        temp_deals_contacts_list = pd.DataFrame(row['associations.associatedVids'],
+                                               columns = ['Contact_ID'])
+        temp_deals_contacts_list['Deal_ID'] = row['dealId']    
+        Deals_Contacts_list = Deals_Contacts_list.append(temp_deals_contacts_list)
 
 ### Create table with Pipelines' Stages.
 for index, row in Pipelines.iterrows():
@@ -210,6 +217,7 @@ Activities.to_csv('/data/out/tables/activities.csv', index = False)
 Lists.to_csv('/data/out/tables/lists.csv', index = False)
 Pipelines.to_csv('/data/out/tables/pipelines.csv', index = False)
 Owners.to_csv('/data/out/tables/owners.csv', index = False)
+Deals_Contacts_list.to_csv('/data/out/tables/deals_contacts_list.csv', index = False)
 Deals_stage_history.to_csv('/data/out/tables/deals_stage_history.csv', index = False)
 Pipeline_stages.to_csv('/data/out/tables/pipeline_stages.csv', index = False)
 Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
