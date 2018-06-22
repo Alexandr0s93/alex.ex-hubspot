@@ -20,9 +20,9 @@ def getContacts(token):
                          'lastname','email','mobilephone','phone','city',
                          'country','region','jobtitle','company','website','numemployees',
                          'industry','associatedcompanyid','hs_lead_status','lastmodifieddate',
-                         'newsletter_opt_in','source','hs_email_optout','twitterhandle','lead_type',
+                         'source','hs_email_optout','twitterhandle','lead_type',
                          'hubspot_owner_id','notes_last_updated','hs_analytics_source','opt_in',
-                         'createdate','hs_twitterid','associatedcompanyid','lifecyclestage']
+                         'createdate','hs_twitterid','lifecyclestage']
     
     while True:
         
@@ -126,19 +126,31 @@ def getLists(token):
             return final_df
         
         offset = req_response['offset']
+
+def getPipelines(token):
+    
+    final_df = pd.DataFrame()
+    
+    parameters = {'hapikey': token}
+    req = requests.get('https://api.hubapi.com/deals/v1/pipelines', params = parameters)
+    req_response = req.json()
+        
+    final_df = final_df.append(json_normalize(req_response))
+    
+    return final_df
         
 def getOwners(token):
     
     final_df = pd.DataFrame()
     
     parameters = {'hapikey': token}
-    req = requests.get(' https://api.hubapi.com/owners/v2/owners/', params = parameters)
+    req = requests.get('https://api.hubapi.com/owners/v2/owners/', params = parameters)
     req_response = req.json()
         
     final_df = final_df.append(json_normalize(req_response))
     
     return final_df
-                    
+                 
 ## Datasets extraction
 print('Extracting Companies from HubSpot CRM')        
 Companies = getCompanies(token)
@@ -147,14 +159,18 @@ Contacts = getContacts(token)
 print('Extracting Deals from HubSpot CRM')
 Deals = getDeals(token)
 print('Extracting Activities from HubSpot CRM')
-Activities = getActivities('90a176d2-789f-4393-99aa-96b3f908934f')
+Activities = getActivities(token)
 print('Extracting Lists from HubSpot CRM')
 Lists = getLists(token)
+print('Extracting Pipelines from HubSpot CRM')
+Pipelines = getPipelines(token)
 print('Extracting Owners from HubSpot CRM')
 Owners = getOwners(token)
 
 Contacts_sub_forms = pd.DataFrame()
 Contacts_Lists = pd.DataFrame()
+Deals_stage_history = pd.DataFrame()
+Pipeline_stages = pd.DataFrame()
 
 ### Create table with Contact's form submissions and lists and drop column afterwards
 for index, row in Contacts.iterrows():
@@ -168,6 +184,22 @@ for index, row in Contacts.iterrows():
         temp_contacts_lists['CONTACT_ID'] = row['canonical-vid']
         Contacts_Lists = Contacts_Lists.append(temp_contacts_lists)
 
+### Create table with Deals' Stage History
+for index, row in Deals.iterrows():
+    
+    if len(row['properties.dealstage.versions']) > 0 :
+        temp_stage_history= pd.DataFrame(row['properties.dealstage.versions'])
+        temp_stage_history['DEAL_ID'] = row['dealId']    
+        Deals_stage_history = Deals_stage_history.append(temp_stage_history)
+
+### Create table with Pipelines' Stages.
+for index, row in Pipelines.iterrows():
+    
+    if len(row['stages']) > 0 :
+        temp_pipelines_stages= pd.DataFrame(row['stages'])
+        temp_pipelines_stages['PIPELINE_ID'] = row['pipelineId']    
+        Pipeline_stages = Pipeline_stages.append(temp_pipelines_stages)
+
 Contacts = Contacts.drop(['form-submissions', 'list-memberships'], 1)
 
 ### Write extracted data
@@ -176,6 +208,9 @@ Contacts.to_csv('/data/out/tables/contacts.csv', index = False)
 Deals.to_csv('/data/out/tables/deals.csv', index = False)
 Activities.to_csv('/data/out/tables/activities.csv', index = False)
 Lists.to_csv('/data/out/tables/lists.csv', index = False)
+Pipelines.to_csv('/data/out/tables/pipelines.csv', index = False)
 Owners.to_csv('/data/out/tables/owners.csv', index = False)
+Deals_stage_history.to_csv('/data/out/tables/deals_stage_history.csv', index = False)
+Pipeline_stages.to_csv('/data/out/tables/pipeline_stages.csv', index = False)
 Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
 Contacts_Lists.to_csv('/data/out/tables/contacts_lists.csv', index = False)
