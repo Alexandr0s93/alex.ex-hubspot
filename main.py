@@ -46,7 +46,7 @@ def getCompanies(token):
                          'city','country','website','numberofemployees',
                          'industry','annualrevenue','linkedin_company_page',
                          'hs_lastmodifieddate','hubspot_owner_id','notes_last_updated','description',
-                         'createdate','numberofemployees','about_us', 'hs_lead_status']
+                         'createdate','numberofemployees','about_us', 'hs_lead_status','founded_year']
     
     while True:
         
