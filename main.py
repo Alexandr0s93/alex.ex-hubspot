@@ -91,11 +91,10 @@ def getCampaigns(token):
     
     campaign_ids = pd.DataFrame()
     final_df = pd.DataFrame()
-    offset = ''
+    parameters = {'hapikey': token, 'limit': 1000}
     
     while True:
         
-        parameters = {'hapikey': token, 'offset': offset, 'limit': 1000}
         req = requests.get('https://api.hubapi.com/email/public/v1/campaigns/by-id', params = parameters)
         req_response = req.json()
             
@@ -106,8 +105,8 @@ def getCampaigns(token):
             break
         
         offset = req_response['offset']
+        parameters = {'hapikey': token, 'offset': offset, 'limit': 1000}
         
-    offset = ''
     
     for index,row in campaign_ids.iterrows():
         
