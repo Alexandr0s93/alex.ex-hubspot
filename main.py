@@ -114,7 +114,7 @@ def getCampaigns(token):
         req = requests.get('https://api.hubapi.com/email/public/v1/campaigns/' + str(row['id']), params = parameters)
         req_response = req.json()
         
-        final_df = final_df.append(json_normalize(req_response['campaigns']))
+        final_df = final_df.append(json_normalize(req_response))
         
     return final_df
                 
