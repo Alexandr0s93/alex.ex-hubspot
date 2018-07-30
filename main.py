@@ -86,6 +86,73 @@ def getDeals(token):
             return final_df
         
         offset = req_response['offset']
+
+def getCampaigns(token):
+    
+    campaign_ids = pd.DataFrame()
+    final_df = pd.DataFrame()
+    offset = ''
+    
+    while True:
+        
+        parameters = {'hapikey': token, 'offset': offset, 'limit': 1000}
+        req = requests.get('https://api.hubapi.com/email/public/v1/campaigns/by-id', params = parameters)
+        req_response = req.json()
+            
+        if req_response['hasMore'] == True:
+            campaign_ids = campaign_ids.append(json_normalize(req_response['campaigns']))
+        else:
+            campaign_ids = campaign_ids.append(json_normalize(req_response['campaigns']))
+            break
+        
+        offset = req_response['offset']
+        
+    offset = ''
+    
+    for index,row in campaign_ids.iterrows():
+        
+        parameters = {'hapikey': token}
+        req = requests.get('https://api.hubapi.com/email/public/v1/campaigns/' + str(row['id']), params = parameters)
+        req_response = req.json()
+        
+        final_df = final_df.append(json_normalize(req_response['campaigns']))
+        
+    return final_df
+                
+def getEmailEvents(token):
+    
+    final_df = pd.DataFrame()
+    offset = ''
+    
+    while True:
+        
+        parameters = {'hapikey': token, 'eventType': 'OPEN', 'offset': offset, 'limit': 1000}
+        req = requests.get('https://api.hubapi.com/email/public/v1/events', params = parameters)
+        req_response = req.json()
+            
+        if req_response['hasMore'] == True:
+            final_df = final_df.append(json_normalize(req_response['events']))
+        else:
+            final_df = final_df.append(json_normalize(req_response['events']))
+            break
+        
+        offset = req_response['offset']
+        
+    offset = ''
+    
+    while True:
+        
+        parameters = {'hapikey': token, 'eventType': 'CLICK', 'offset': offset, 'limit': 1000}
+        req = requests.get('https://api.hubapi.com/email/public/v1/events', params = parameters)
+        req_response = req.json()
+            
+        if req_response['hasMore'] == True:
+            final_df = final_df.append(json_normalize(req_response['events']))
+        else:
+            final_df = final_df.append(json_normalize(req_response['events']))
+            return final_df
+        
+        offset = req_response['offset']        
         
 def getActivities(token):
     
@@ -158,6 +225,10 @@ print('Extracting Contacts from HubSpot CRM')
 Contacts = getContacts(token)
 print('Extracting Deals from HubSpot CRM')
 Deals = getDeals(token)
+print('Extracting Campaigns from HubSpot CRM')
+Campaigns = getCampaigns(token)
+print('Extracting Email Events from HubSpot CRM')
+Email_Events = getEmailEvents(token)
 print('Extracting Activities from HubSpot CRM')
 Activities = getActivities(token)
 print('Extracting Lists from HubSpot CRM')
@@ -213,6 +284,8 @@ Contacts = Contacts.drop(['form-submissions', 'list-memberships'], 1)
 Companies.to_csv('/data/out/tables/companies.csv', index = False)
 Contacts.to_csv('/data/out/tables/contacts.csv', index = False)
 Deals.to_csv('/data/out/tables/deals.csv', index = False)
+Campaigns.to_csv('/data/out/tables/campaigns.csv', index = False)
+Email_Events.to_csv('/data/out/tables/email_events.csv', index = False)
 Activities.to_csv('/data/out/tables/activities.csv', index = False)
 Lists.to_csv('/data/out/tables/lists.csv', index = False)
 Pipelines.to_csv('/data/out/tables/pipelines.csv', index = False)
