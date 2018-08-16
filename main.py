@@ -224,18 +224,18 @@ print('Extracting Contacts from HubSpot CRM')
 Contacts = getContacts(token)
 print('Extracting Deals from HubSpot CRM')
 Deals = getDeals(token)
-print('Extracting Campaigns from HubSpot CRM')
-Campaigns = getCampaigns(token)
-print('Extracting Email Events from HubSpot CRM')
-Email_Events = getEmailEvents(token)
-print('Extracting Activities from HubSpot CRM')
-Activities = getActivities(token)
-print('Extracting Lists from HubSpot CRM')
-Lists = getLists(token)
+#print('Extracting Campaigns from HubSpot CRM')
+#Campaigns = getCampaigns(token)
+#print('Extracting Email Events from HubSpot CRM')
+#Email_Events = getEmailEvents(token)
+#print('Extracting Activities from HubSpot CRM')
+#Activities = getActivities(token)
+#print('Extracting Lists from HubSpot CRM')
+#Lists = getLists(token)
 print('Extracting Pipelines from HubSpot CRM')
 Pipelines = getPipelines(token)
-print('Extracting Owners from HubSpot CRM')
-Owners = getOwners(token)
+#print('Extracting Owners from HubSpot CRM')
+#Owners = getOwners(token)
 
 Contacts_sub_forms = pd.DataFrame()
 Contacts_Lists = pd.DataFrame()
@@ -243,17 +243,17 @@ Deals_Contacts_list = pd.DataFrame()
 Deals_stage_history = pd.DataFrame()
 Pipeline_stages = pd.DataFrame()
 
-### Create table with Contact's form submissions and lists and drop column afterwards
-for index, row in Contacts.iterrows():
-    
-    if len(row['form-submissions']) > 0 :
-        temp_contacts_sub_forms = pd.DataFrame(row['form-submissions'])
-        temp_contacts_sub_forms['CONTACT_ID'] = row['canonical-vid']    
-        Contacts_sub_forms = Contacts_sub_forms.append(temp_contacts_sub_forms)
-    if len(row['list-memberships']) > 0 :
-        temp_contacts_lists = pd.DataFrame(row['list-memberships'])
-        temp_contacts_lists['CONTACT_ID'] = row['canonical-vid']
-        Contacts_Lists = Contacts_Lists.append(temp_contacts_lists)
+#### Create table with Contact's form submissions and lists and drop column afterwards
+#for index, row in Contacts.iterrows():
+#    
+#    if len(row['form-submissions']) > 0 :
+#        temp_contacts_sub_forms = pd.DataFrame(row['form-submissions'])
+#        temp_contacts_sub_forms['CONTACT_ID'] = row['canonical-vid']    
+#        Contacts_sub_forms = Contacts_sub_forms.append(temp_contacts_sub_forms)
+#    if len(row['list-memberships']) > 0 :
+#        temp_contacts_lists = pd.DataFrame(row['list-memberships'])
+#        temp_contacts_lists['CONTACT_ID'] = row['canonical-vid']
+#        Contacts_Lists = Contacts_Lists.append(temp_contacts_lists)
 
 ### Create table with Deals' Stage History & Deals' Contacts List
 for index, row in Deals.iterrows():
@@ -283,14 +283,14 @@ Contacts = Contacts.drop(['form-submissions', 'list-memberships'], 1)
 Companies.to_csv('/data/out/tables/companies.csv', index = False)
 Contacts.to_csv('/data/out/tables/contacts.csv', index = False)
 Deals.to_csv('/data/out/tables/deals.csv', index = False)
-Campaigns.to_csv('/data/out/tables/campaigns.csv', index = False)
-Email_Events.to_csv('/data/out/tables/email_events.csv', index = False)
-Activities.to_csv('/data/out/tables/activities.csv', index = False)
-Lists.to_csv('/data/out/tables/lists.csv', index = False)
+#Campaigns.to_csv('/data/out/tables/campaigns.csv', index = False)
+#Email_Events.to_csv('/data/out/tables/email_events.csv', index = False)
+#Activities.to_csv('/data/out/tables/activities.csv', index = False)
+#Lists.to_csv('/data/out/tables/lists.csv', index = False)
 Pipelines.to_csv('/data/out/tables/pipelines.csv', index = False)
-Owners.to_csv('/data/out/tables/owners.csv', index = False)
+#Owners.to_csv('/data/out/tables/owners.csv', index = False)
 Deals_Contacts_list.to_csv('/data/out/tables/deals_contacts_list.csv', index = False)
 Deals_stage_history.to_csv('/data/out/tables/deals_stage_history.csv', index = False)
 Pipeline_stages.to_csv('/data/out/tables/pipeline_stages.csv', index = False)
-Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
-Contacts_Lists.to_csv('/data/out/tables/contacts_lists.csv', index = False)
+#Contacts_sub_forms.to_csv('/data/out/tables/contacts_form_submissions.csv', index = False)
+#Contacts_Lists.to_csv('/data/out/tables/contacts_lists.csv', index = False)
